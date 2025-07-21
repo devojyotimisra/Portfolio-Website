@@ -168,7 +168,6 @@ export default function Portfolio() {
       image: "/project-1.png?height=400&width=600",
       github: "https://github.com/devojyotimisra/nyaayveer",
       tech: ["Python", "NLP", "FastAPI", "React", "Transformers", "Legal AI"],
-      category: "AI/Legal Tech",
       features: ["Document Analysis", "Case Research", "Legal Query Processing", "Automated Compliance"],
       gradient: "from-blue-500 via-purple-500 to-pink-500",
     },
@@ -183,7 +182,6 @@ export default function Portfolio() {
       image: "/project-2.png?height=400&width=600",
       github: "https://github.com/devojyotimisra/voicecrux",
       tech: ["Python", "Speech Recognition", "ML", "Audio Processing", "Deep Learning", "NLU"],
-      category: "Voice AI",
       features: ["Real-time Processing", "Multi-language Support", "Voice Synthesis", "Noise Reduction"],
       gradient: "from-green-500 via-teal-500 to-blue-500",
     },
@@ -198,7 +196,6 @@ export default function Portfolio() {
       image: "/project-3.png?height=400&width=600",
       github: "https://github.com/devojyotimisra/bingebuddy",
       tech: ["Python", "Recommendation Systems", "ML", "Data Analysis", "Deep Learning", "API"],
-      category: "Recommendation AI",
       features: ["Personalized Recommendations", "Social Integration", "Trend Analysis", "Multi-platform Support"],
       gradient: "from-orange-500 via-red-500 to-pink-500",
     },
@@ -429,15 +426,15 @@ export default function Portfolio() {
                 My Journey
               </h2>
               <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-                From curious beginner to AI researcher - here's how my passion for technology evolved into expertise
+                From curious beginner to AI researcher – here's how my passion for technology evolved into expertise
               </p>
             </motion.div>
 
             <div className="relative">
-              {/* Vertical timeline line */}
+              {/* Vertical line */}
               <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-purple-500 via-pink-500 to-blue-500 rounded-full" />
 
-              <div className="space-y-16">
+              <div className="space-y-24">
                 {roadmapData.map((item, index) => (
                   <motion.div
                     key={item.year}
@@ -445,17 +442,18 @@ export default function Portfolio() {
                     whileInView={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.8, delay: index * 0.2 }}
                     viewport={{ once: true }}
-                    className={`flex items-center ${index % 2 === 0 ? "flex-row" : "flex-row-reverse"}`}
+                    className={`flex flex-col md:flex-row items-center ${index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
+                      }`}
                   >
-                    {/* CARD */}
-                    <div className="w-1/2 px-8 text-left">
+                    {/* Content Box */}
+                    <div className="w-full md:w-1/2 px-4 md:px-8 text-center md:text-left">
                       <Card className="bg-white/10 backdrop-blur-xl border border-white/20 hover:bg-white/15 transition-all duration-300">
                         <CardContent className="p-8">
-                          <div className="flex items-center gap-4 mb-6">
+                          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 mb-6">
                             <div className={`p-4 rounded-full bg-gradient-to-r ${item.color}`}>
                               <item.icon className="w-8 h-8 text-white" />
                             </div>
-                            <div>
+                            <div className="text-center sm:text-left">
                               <h3 className="text-2xl font-bold text-white">{item.title}</h3>
                               <p className="text-purple-400 font-semibold text-lg">{item.year}</p>
                             </div>
@@ -463,7 +461,7 @@ export default function Portfolio() {
                           <p className="text-gray-300 mb-6 text-lg">{item.description}</p>
                           <div className="space-y-3">
                             {item.achievements.map((achievement, i) => (
-                              <div key={i} className="flex items-center gap-3">
+                              <div key={i} className="flex items-center gap-3 justify-center sm:justify-start">
                                 <Star className="w-5 h-5 text-yellow-400" />
                                 <span className="text-gray-400">{achievement}</span>
                               </div>
@@ -473,8 +471,8 @@ export default function Portfolio() {
                       </Card>
                     </div>
 
-                    {/* TIMELINE CIRCLE */}
-                    <div className="relative z-10 flex-shrink-0">
+                    {/* Circle Icon */}
+                    <div className="relative z-10 my-6 md:my-0 flex-shrink-0">
                       <div
                         className={`w-20 h-20 rounded-full bg-gradient-to-r ${item.color} flex items-center justify-center border-4 border-black`}
                       >
@@ -482,14 +480,15 @@ export default function Portfolio() {
                       </div>
                     </div>
 
-                    {/* SPACER */}
-                    <div className="w-1/2" />
+                    {/* Spacer on larger screens only */}
+                    <div className="hidden md:block w-1/2" />
                   </motion.div>
                 ))}
               </div>
             </div>
           </div>
         </section>
+
 
 
         <section id="skills" className="py-20 bg-white/5 backdrop-blur-sm">
@@ -619,14 +618,6 @@ export default function Portfolio() {
                           alt={projects[activeProject].title}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                         />
-
-                        <div className="absolute top-4 left-4">
-                          <Badge
-                            className={`bg-gradient-to-r ${projects[activeProject].gradient} text-white border-0 px-3 py-1 text-sm font-semibold`}
-                          >
-                            {projects[activeProject].category}
-                          </Badge>
-                        </div>
 
                         <div
                           className={`absolute inset-0 bg-gradient-to-br ${projects[activeProject].gradient} opacity-20 mix-blend-overlay`}
