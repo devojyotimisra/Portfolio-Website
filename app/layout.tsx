@@ -7,9 +7,10 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "Devojyoti Misra - AI/ML Developer & Researcher",
-  description: "Portfolio of Devojyoti Misra - AI/ML Developer and Researcher specializing in deep learning, computer vision, and natural language processing.",
+  description:
+    "Portfolio of Devojyoti Misra - AI/ML Developer and Researcher specializing in deep learning, computer vision, and natural language processing.",
   icons: {
-    icon: '/favicon.png',
+    icon: "/favicon.JPG", type: "img/png",
   },
 }
 

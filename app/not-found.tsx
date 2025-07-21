@@ -13,9 +13,11 @@ export default function NotFound() {
   const router = useRouter()
 
   useEffect(() => {
+    // Prevent scrolling on mount
     document.body.style.overflow = 'hidden'
     document.documentElement.style.overflow = 'hidden'
-
+    
+    // Generate fewer particles for 404 page
     const newParticles = Array.from({ length: 15 }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
@@ -24,6 +26,7 @@ export default function NotFound() {
     }))
     setParticles(newParticles)
 
+    // Countdown timer
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
@@ -34,6 +37,7 @@ export default function NotFound() {
       })
     }, 1000)
 
+    // Cleanup function to restore scrolling when component unmounts
     return () => {
       clearInterval(timer)
       document.body.style.overflow = 'unset'
@@ -43,6 +47,7 @@ export default function NotFound() {
 
   return (
     <>
+      {/* Inline styles to prevent any scrolling immediately */}
       <style jsx global>{`
         html, body {
           overflow: hidden !important;
@@ -57,11 +62,14 @@ export default function NotFound() {
           overflow: hidden !important;
         }
       `}</style>
-
+      
       <div className="fixed inset-0 h-screen w-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white overflow-hidden flex items-center justify-center">
+        {/* Background Layer */}
         <div className="absolute inset-0 pointer-events-none">
+          {/* Base gradient background */}
           <div className="absolute inset-0 bg-gradient-to-br from-red-900/10 via-black to-purple-900/10" />
 
+          {/* Animated particles */}
           {particles.map((particle) => (
             <motion.div
               key={particle.id}
@@ -85,11 +93,14 @@ export default function NotFound() {
             />
           ))}
 
+          {/* Subtle glow effects */}
           <div className="absolute top-1/3 left-1/3 w-64 h-64 bg-red-500/3 rounded-full blur-3xl animate-pulse" />
           <div className="absolute bottom-1/3 right-1/3 w-64 h-64 bg-purple-500/3 rounded-full blur-3xl animate-pulse" />
         </div>
 
+        {/* Main Content */}
         <div className="relative z-10 text-center px-4 max-w-2xl mx-auto">
+          {/* 404 Animation */}
           <motion.div
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -110,6 +121,7 @@ export default function NotFound() {
             </div>
           </motion.div>
 
+          {/* Error Message */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -122,6 +134,7 @@ export default function NotFound() {
             </p>
           </motion.div>
 
+          {/* Glitch Effect Text */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -139,12 +152,14 @@ export default function NotFound() {
             </motion.p>
           </motion.div>
 
+          {/* Countdown and Button */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7, duration: 0.8 }}
             className="space-y-4 lg:space-y-6"
           >
+            {/* Countdown */}
             <div className="text-gray-400 text-sm lg:text-base">
               Redirecting to home in{" "}
               <motion.span
@@ -159,6 +174,7 @@ export default function NotFound() {
               seconds
             </div>
 
+            {/* Home Button */}
             <Link href="/">
               <Button
                 size="lg"
@@ -170,6 +186,7 @@ export default function NotFound() {
             </Link>
           </motion.div>
 
+          {/* AI Quote */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -187,6 +204,7 @@ export default function NotFound() {
           </motion.div>
         </div>
 
+        {/* Floating Elements */}
         <motion.div
           animate={{
             y: [0, -15, 0],
@@ -213,6 +231,7 @@ export default function NotFound() {
           className="absolute bottom-16 sm:bottom-20 right-6 sm:right-10 w-10 h-10 sm:w-16 sm:h-16 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full blur-xl"
         />
 
+        {/* Progress Bar */}
         <div className="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 w-48 sm:w-64 h-1 bg-gray-800 rounded-full overflow-hidden">
           <motion.div
             className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"

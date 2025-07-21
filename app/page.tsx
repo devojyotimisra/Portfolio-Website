@@ -24,17 +24,16 @@ import {
   Globe,
   Target,
   Rocket,
-  ExternalLink,
   Play,
   Pause,
   Zap,
-  Eye,
 } from "lucide-react"
 
 export default function Portfolio() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeProject, setActiveProject] = useState(0)
   const [isProjectsAutoPlay, setIsProjectsAutoPlay] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
   const { scrollYProgress } = useScroll()
 
   const mouseX = useMotionValue(0)
@@ -45,7 +44,17 @@ export default function Portfolio() {
   const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; size: number }>>([])
 
   useEffect(() => {
-    const newParticles = Array.from({ length: 30 }, (_, i) => ({
+    // Check if mobile
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+
+    // Reduce particles on mobile for performance
+    const particleCount = window.innerWidth < 768 ? 8 : 30
+    const newParticles = Array.from({ length: particleCount }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
@@ -54,21 +63,33 @@ export default function Portfolio() {
     setParticles(newParticles)
 
     const handleMouseMove = (e: MouseEvent) => {
-      mouseX.set(e.clientX)
-      mouseY.set(e.clientY)
+      // Only set mouse position on desktop
+      if (!isMobile) {
+        mouseX.set(e.clientX)
+        mouseY.set(e.clientY)
+      }
     }
 
     window.addEventListener("mousemove", handleMouseMove)
-    return () => window.removeEventListener("mousemove", handleMouseMove)
-  }, [mouseX, mouseY])
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove)
+      window.removeEventListener("resize", checkMobile)
+    }
+  }, [mouseX, mouseY, isMobile])
 
   useEffect(() => {
+    // Disable auto-play on mobile for performance
+    if (isMobile) {
+      setIsProjectsAutoPlay(false)
+      return
+    }
+
     if (!isProjectsAutoPlay) return
     const interval = setInterval(() => {
       setActiveProject((prev) => (prev + 1) % projects.length)
     }, 8000)
     return () => clearInterval(interval)
-  }, [isProjectsAutoPlay])
+  }, [isProjectsAutoPlay, isMobile])
 
   const skillCategories = [
     {
@@ -119,7 +140,11 @@ export default function Portfolio() {
       title: "Foundation Building",
       description: "Started journey in Computer Science",
       icon: GraduationCap,
-      achievements: ["Enrolled in IIT Madars and Burdwan University", "Mastered C & Python fundamentals", "Built a few initial projects"],
+      achievements: [
+        "Enrolled in IIT Madars and Burdwan University",
+        "Mastered C & Python fundamentals",
+        "Built a few initial projects",
+      ],
       color: "from-blue-500 to-cyan-500",
     },
     {
@@ -143,7 +168,11 @@ export default function Portfolio() {
       title: "Advanced Research",
       description: "Deep learning and specialization",
       icon: Rocket,
-      achievements: ["Research Intern at IIT Roorkee", "98.7% accuracy on hyperspectral data", "Explorent UNet, RNet, CNN's and much more"],
+      achievements: [
+        "Research Intern at IIT Roorkee",
+        "98.7% accuracy on hyperspectral data",
+        "Explorent UNet, RNet, CNN's and much more",
+      ],
       color: "from-orange-500 to-red-500",
     },
     {
@@ -235,7 +264,7 @@ export default function Portfolio() {
               scale: [1, 1.2, 1],
             }}
             transition={{
-              duration: 4 + Math.random() * 2,
+              duration: isMobile ? 6 : 4 + Math.random() * 2, // Slower on mobile
               repeat: Number.POSITIVE_INFINITY,
               delay: Math.random() * 2,
             }}
@@ -246,15 +275,18 @@ export default function Portfolio() {
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse" />
       </div>
 
-      <motion.div
-        className="fixed w-4 h-4 bg-gradient-to-r from-purple-400/50 to-blue-400/50 rounded-full blur-sm pointer-events-none z-50"
-        style={{
-          x: springX,
-          y: springY,
-          translateX: "-50%",
-          translateY: "-50%",
-        }}
-      />
+      {/* Mouse follower - only show on desktop */}
+      {!isMobile && (
+        <motion.div
+          className="fixed w-4 h-4 bg-gradient-to-r from-purple-400/50 to-blue-400/50 rounded-full blur-sm pointer-events-none z-50"
+          style={{
+            x: springX,
+            y: springY,
+            translateX: "-50%",
+            translateY: "-50%",
+          }}
+        />
+      )}
 
       <nav className="fixed top-0 w-full z-40 bg-black/20 backdrop-blur-xl border-b border-white/10 h-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
@@ -262,7 +294,7 @@ export default function Portfolio() {
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="text-2xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent"
+              className="text-xl md:text-2xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent"
             >
               Devojyoti Misra
             </motion.div>
@@ -320,10 +352,10 @@ export default function Portfolio() {
               <motion.div
                 initial={{ opacity: 0, scale: 0.5 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8 }}
-                className="relative mb-12 lg:mb-16"
+                transition={{ duration: isMobile ? 0.5 : 0.8 }}
+                className="relative mb-8 lg:mb-16"
               >
-                <div className="w-56 h-56 lg:w-64 lg:h-64 mx-auto relative">
+                <div className="w-48 h-48 sm:w-56 sm:h-56 lg:w-64 lg:h-64 mx-auto relative">
                   <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 rounded-full blur-2xl opacity-60 animate-pulse" />
                   <img
                     src="/profile-pic.png?height=256&width=256"
@@ -336,17 +368,17 @@ export default function Portfolio() {
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.8 }}
+                transition={{ delay: isMobile ? 0.2 : 0.3, duration: isMobile ? 0.5 : 0.8 }}
               >
-                <h1 className="text-6xl lg:text-8xl font-bold mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+                <h1 className="text-4xl sm:text-6xl lg:text-8xl font-bold mb-4 lg:mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
                   Devojyoti Misra
                 </h1>
-                <div className="text-2xl lg:text-3xl text-gray-300 mb-4 flex items-center justify-center gap-4">
-                  <Brain className="w-8 h-8 text-purple-400" />
+                <div className="text-lg sm:text-2xl lg:text-3xl text-gray-300 mb-4 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
+                  <Brain className="w-6 h-6 sm:w-8 sm:h-8 text-purple-400" />
                   <span>AI/ML Developer & Researcher</span>
-                  <Cpu className="w-8 h-8 text-blue-400" />
+                  <Cpu className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
                 </div>
-                <p className="text-xl text-gray-400 mb-8 max-w-3xl mx-auto leading-relaxed">
+                <p className="text-base sm:text-xl text-gray-400 mb-6 lg:mb-8 max-w-3xl mx-auto leading-relaxed px-4">
                   Passionate about pushing the boundaries of Artificial Intelligence and Machine Learning. Currently
                   researching hyperspectral image classification and authorship attribution with cutting-edge deep
                   learning techniques.
@@ -356,26 +388,26 @@ export default function Portfolio() {
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6, duration: 0.8 }}
-                className="flex flex-col sm:flex-row gap-6 justify-center mb-12"
+                transition={{ delay: isMobile ? 0.3 : 0.6, duration: isMobile ? 0.5 : 0.8 }}
+                className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center mb-8 lg:mb-12 px-4"
               >
                 <Button
-                  size="lg"
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-4 text-lg font-semibold rounded-full transition-all duration-300 transform hover:scale-105"
+                  size={isMobile ? "default" : "lg"}
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-full transition-all duration-300 transform hover:scale-105"
                   onClick={() => scrollToSection("projects")}
                 >
-                  <Rocket className="mr-2 h-5 w-5" />
+                  <Rocket className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                   Explore My Work
                 </Button>
                 <Button
                   variant="outline"
-                  size="lg"
-                  className="border-2 border-purple-500/50 text-purple-400 hover:bg-purple-500/20 hover:text-white px-8 py-4 text-lg font-semibold rounded-full transition-all duration-300 transform hover:scale-105 bg-white/5 backdrop-blur-sm"
+                  size={isMobile ? "default" : "lg"}
+                  className="border-2 border-purple-500/50 text-purple-400 hover:bg-purple-500/20 hover:text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-full transition-all duration-300 transform hover:scale-105 bg-white/5 backdrop-blur-sm"
                   onClick={() =>
                     window.open("https://drive.google.com/file/d/1BroJKia50IyA3O72gr1eAfv4IxA2oSSB", "_blank")
                   }
                 >
-                  <Download className="mr-2 h-5 w-5" />
+                  <Download className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                   Download CV
                 </Button>
               </motion.div>
@@ -383,8 +415,8 @@ export default function Portfolio() {
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.9, duration: 0.8 }}
-                className="flex gap-6 justify-center"
+                transition={{ delay: isMobile ? 0.4 : 0.9, duration: isMobile ? 0.5 : 0.8 }}
+                className="flex gap-4 sm:gap-6 justify-center"
               >
                 {[
                   { icon: Linkedin, href: "https://linkedin.com/in/devojyotimisra", color: "hover:text-blue-400" },
@@ -401,11 +433,11 @@ export default function Portfolio() {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    whileHover={{ scale: 1.2, rotate: 5 }}
+                    whileHover={isMobile ? {} : { scale: 1.2, rotate: 5 }}
                     whileTap={{ scale: 0.9 }}
-                    className={`p-4 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-gray-400 ${social.color} transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25`}
+                    className={`p-3 sm:p-4 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-gray-400 ${social.color} transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25`}
                   >
-                    <social.icon size={24} />
+                    <social.icon size={isMobile ? 20 : 24} />
                   </motion.a>
                 ))}
               </motion.div>
@@ -413,54 +445,55 @@ export default function Portfolio() {
           </div>
         </section>
 
-        <section id="roadmap" className="py-20 relative">
+        <section id="roadmap" className="py-16 sm:py-20 relative">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: isMobile ? 0.5 : 0.8 }}
               viewport={{ once: true }}
-              className="text-center mb-16"
+              className="text-center mb-12 sm:mb-16"
             >
-              <h2 className="text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
                 My Journey
               </h2>
-              <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              <p className="text-lg sm:text-xl text-gray-400 max-w-3xl mx-auto px-4">
                 From curious beginner to AI researcher – here's how my passion for technology evolved into expertise
               </p>
             </motion.div>
 
             <div className="relative">
               <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-purple-500 via-pink-500 to-blue-500 rounded-full" />
-              <div className="space-y-24">
+              <div className="space-y-16 sm:space-y-24">
                 {roadmapData.map((item, index) => (
                   <motion.div
                     key={item.year}
-                    initial={{ opacity: 0, x: index % 2 === 0 ? -100 : 100 }}
+                    initial={{ opacity: 0, x: isMobile ? 0 : index % 2 === 0 ? -100 : 100 }}
                     whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.8, delay: index * 0.2 }}
+                    transition={{ duration: isMobile ? 0.5 : 0.8, delay: isMobile ? 0 : index * 0.2 }}
                     viewport={{ once: true }}
-                    className={`flex flex-col md:flex-row items-center ${index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
-                      }`}
+                    className={`flex flex-col md:flex-row items-center ${
+                      index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
+                    }`}
                   >
                     <div className="w-full md:w-1/2 px-4 md:px-8 text-center md:text-left">
                       <Card className="bg-white/10 backdrop-blur-xl border border-white/20 hover:bg-white/15 transition-all duration-300">
-                        <CardContent className="p-8">
+                        <CardContent className="p-6 sm:p-8">
                           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 mb-6">
-                            <div className={`p-4 rounded-full bg-gradient-to-r ${item.color}`}>
-                              <item.icon className="w-8 h-8 text-white" />
+                            <div className={`p-3 sm:p-4 rounded-full bg-gradient-to-r ${item.color}`}>
+                              <item.icon className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                             </div>
                             <div className="text-center sm:text-left">
-                              <h3 className="text-2xl font-bold text-white">{item.title}</h3>
-                              <p className="text-purple-400 font-semibold text-lg">{item.year}</p>
+                              <h3 className="text-xl sm:text-2xl font-bold text-white">{item.title}</h3>
+                              <p className="text-purple-400 font-semibold text-base sm:text-lg">{item.year}</p>
                             </div>
                           </div>
-                          <p className="text-gray-300 mb-6 text-lg">{item.description}</p>
+                          <p className="text-gray-300 mb-6 text-base sm:text-lg">{item.description}</p>
                           <div className="space-y-3">
                             {item.achievements.map((achievement, i) => (
                               <div key={i} className="flex items-center gap-3 justify-center sm:justify-start">
-                                <Star className="w-5 h-5 text-yellow-400" />
-                                <span className="text-gray-400">{achievement}</span>
+                                <Star className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 flex-shrink-0" />
+                                <span className="text-gray-400 text-sm sm:text-base">{achievement}</span>
                               </div>
                             ))}
                           </div>
@@ -470,9 +503,9 @@ export default function Portfolio() {
 
                     <div className="relative z-10 my-6 md:my-0 flex-shrink-0">
                       <div
-                        className={`w-20 h-20 rounded-full bg-gradient-to-r ${item.color} flex items-center justify-center border-4 border-black`}
+                        className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-r ${item.color} flex items-center justify-center border-4 border-black`}
                       >
-                        <item.icon className="w-10 h-10 text-white" />
+                        <item.icon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
                       </div>
                     </div>
 
@@ -484,62 +517,62 @@ export default function Portfolio() {
           </div>
         </section>
 
-        <section id="skills" className="py-20 bg-white/5 backdrop-blur-sm">
+        <section id="skills" className="py-16 sm:py-20 bg-white/5 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: isMobile ? 0.5 : 0.8 }}
               viewport={{ once: true }}
-              className="text-center mb-16"
+              className="text-center mb-12 sm:mb-16"
             >
-              <h2 className="text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
                 Technical Expertise
               </h2>
-              <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              <p className="text-lg sm:text-xl text-gray-400 max-w-3xl mx-auto px-4">
                 A comprehensive toolkit spanning AI/ML, data science, and software development
               </p>
             </motion.div>
 
-            <div className="grid lg:grid-cols-2 gap-8">
+            <div className="grid lg:grid-cols-2 gap-6 sm:gap-8">
               {skillCategories.map((category, categoryIndex) => (
                 <motion.div
                   key={category.title}
                   initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: categoryIndex * 0.2 }}
+                  transition={{ duration: isMobile ? 0.5 : 0.8, delay: isMobile ? 0 : categoryIndex * 0.2 }}
                   viewport={{ once: true }}
                 >
                   <Card className="bg-white/10 backdrop-blur-xl border border-white/20 hover:bg-white/15 transition-all duration-300 h-full">
-                    <CardContent className="p-8">
-                      <div className="flex items-center gap-4 mb-8">
-                        <div className="p-4 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full">
-                          <category.icon className="w-8 h-8 text-white" />
+                    <CardContent className="p-6 sm:p-8">
+                      <div className="flex items-center gap-4 mb-6 sm:mb-8">
+                        <div className="p-3 sm:p-4 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full">
+                          <category.icon className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                         </div>
-                        <h3 className="text-2xl font-bold text-white">{category.title}</h3>
+                        <h3 className="text-xl sm:text-2xl font-bold text-white">{category.title}</h3>
                       </div>
 
-                      <div className="space-y-6">
+                      <div className="space-y-4 sm:space-y-6">
                         {category.skills.map((skill, skillIndex) => (
                           <motion.div
                             key={skill.name}
                             initial={{ opacity: 0, x: -20 }}
                             whileInView={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.5, delay: skillIndex * 0.1 }}
+                            transition={{ duration: isMobile ? 0.3 : 0.5, delay: isMobile ? 0 : skillIndex * 0.1 }}
                             viewport={{ once: true }}
                             className="space-y-2"
                           >
                             <div className="flex justify-between items-center">
-                              <span className="text-white font-medium">{skill.name}</span>
-                              <span className="text-gray-400">{skill.level}%</span>
+                              <span className="text-white font-medium text-sm sm:text-base">{skill.name}</span>
+                              <span className="text-gray-400 text-sm sm:text-base">{skill.level}%</span>
                             </div>
                             <div className="relative">
-                              <div className="w-full bg-gray-700/50 backdrop-blur-sm rounded-full h-3 border border-white/10">
+                              <div className="w-full bg-gray-700/50 backdrop-blur-sm rounded-full h-2 sm:h-3 border border-white/10">
                                 <motion.div
-                                  className={`h-3 rounded-full bg-gradient-to-r ${skill.color}`}
+                                  className={`h-2 sm:h-3 rounded-full bg-gradient-to-r ${skill.color}`}
                                   initial={{ width: 0 }}
                                   whileInView={{ width: `${skill.level}%` }}
-                                  transition={{ duration: 1.5, delay: skillIndex * 0.1 }}
+                                  transition={{ duration: isMobile ? 1 : 1.5, delay: isMobile ? 0 : skillIndex * 0.1 }}
                                   viewport={{ once: true }}
                                 />
                               </div>
@@ -555,38 +588,52 @@ export default function Portfolio() {
           </div>
         </section>
 
-        <section id="projects" className="py-20 relative overflow-hidden">
+        <section id="projects" className="py-16 sm:py-20 relative overflow-hidden">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: isMobile ? 0.5 : 0.8 }}
               viewport={{ once: true }}
-              className="text-center mb-12"
+              className="text-center mb-8 sm:mb-12"
             >
-              <h2 className="text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
                 Featured Projects
               </h2>
-              <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-6">
+              <p className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto mb-6 px-4">
                 Innovative solutions at the intersection of AI, machine learning, and real-world applications
               </p>
 
-              <div className="flex items-center justify-center gap-4 mb-8">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsProjectsAutoPlay(!isProjectsAutoPlay)}
-                  className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20"
-                >
-                  {isProjectsAutoPlay ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                </Button>
+              {/* Mobile-friendly controls */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+                {!isMobile && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsProjectsAutoPlay(!isProjectsAutoPlay)}
+                    className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20"
+                  >
+                    {isProjectsAutoPlay ? (
+                      <>
+                        <Pause className="w-4 h-4 mr-2" />
+                        Pause
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-4 h-4 mr-2" />
+                        Play
+                      </>
+                    )}
+                  </Button>
+                )}
                 <div className="flex gap-2">
                   {projects.map((_, index) => (
                     <button
                       key={index}
                       onClick={() => setActiveProject(index)}
-                      className={`w-3 h-3 rounded-full transition-all duration-300 ${index === activeProject ? "bg-purple-400 scale-125" : "bg-gray-600 hover:bg-gray-500"
-                        }`}
+                      className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
+                        index === activeProject ? "bg-purple-400 scale-125" : "bg-gray-600 hover:bg-gray-500"
+                      }`}
                     />
                   ))}
                 </div>
@@ -600,57 +647,69 @@ export default function Portfolio() {
                   initial={{ opacity: 0, scale: 0.95, y: 20 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95, y: -20 }}
-                  transition={{ duration: 0.6, type: "spring", stiffness: 100 }}
+                  transition={{ duration: isMobile ? 0.4 : 0.6, type: "spring", stiffness: 100 }}
                   className="relative"
                 >
                   <Card className="bg-white/10 backdrop-blur-xl border border-white/20 overflow-hidden hover:shadow-2xl hover:shadow-purple-500/25 transition-all duration-500">
-                    <div className="grid lg:grid-cols-2 gap-0 min-h-[400px]">
-                      <div className="relative overflow-hidden group h-64 lg:h-full">
+                    {/* Mobile-first responsive layout */}
+                    <div className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-0 min-h-[300px] sm:min-h-[400px]">
+                      {/* Project Image - Full width on mobile, square on desktop */}
+                      <div className="relative overflow-hidden group h-48 sm:h-64 lg:h-full order-1">
                         <img
-                          src={projects[activeProject].image}
+                          src={projects[activeProject].image || "/placeholder.svg"}
                           alt={projects[activeProject].title}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                         />
 
+                        {/* Mobile gradient overlay for better text readability */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-black/30" />
+
+                        {/* Project gradient overlay */}
                         <div
                           className={`absolute inset-0 bg-gradient-to-br ${projects[activeProject].gradient} opacity-20 mix-blend-overlay`}
                         />
                       </div>
 
-                      <div className="p-6 lg:p-8 flex flex-col justify-center">
+                      {/* Project Content - Better mobile spacing */}
+                      <div className="p-4 sm:p-6 lg:p-8 flex flex-col justify-center order-2">
                         <motion.div
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.3 }}
+                          transition={{ delay: isMobile ? 0.1 : 0.3 }}
                         >
-                          <h3 className="text-2xl lg:text-3xl font-bold text-white mb-2">
+                          {/* Title and subtitle - mobile optimized */}
+                          <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2">
                             {projects[activeProject].title}
                           </h3>
                           <p
-                            className={`text-lg bg-gradient-to-r ${projects[activeProject].gradient} bg-clip-text text-transparent font-semibold mb-4`}
+                            className={`text-base sm:text-lg bg-gradient-to-r ${projects[activeProject].gradient} bg-clip-text text-transparent font-semibold mb-3 sm:mb-4`}
                           >
                             {projects[activeProject].subtitle}
                           </p>
-                          <p className="text-gray-300 mb-4 leading-relaxed text-sm lg:text-base">
+
+                          {/* Description - better mobile typography */}
+                          <p className="text-gray-300 mb-3 sm:mb-4 leading-relaxed text-sm sm:text-base">
                             {projects[activeProject].description}
                           </p>
 
-                          <div className="mb-4">
+                          {/* Key Features - mobile-friendly grid */}
+                          <div className="mb-3 sm:mb-4">
                             <h4 className="text-white font-semibold mb-2 flex items-center gap-2 text-sm">
                               <Zap className="w-4 h-4 text-yellow-400" />
                               Key Features
                             </h4>
-                            <div className="grid grid-cols-2 gap-2">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                               {projects[activeProject].features.slice(0, 4).map((feature, index) => (
                                 <div key={index} className="flex items-center gap-2">
-                                  <div className="w-1.5 h-1.5 bg-purple-400 rounded-full" />
-                                  <span className="text-gray-300 text-xs">{feature}</span>
+                                  <div className="w-1.5 h-1.5 bg-purple-400 rounded-full flex-shrink-0" />
+                                  <span className="text-gray-300 text-xs sm:text-sm">{feature}</span>
                                 </div>
                               ))}
                             </div>
                           </div>
 
-                          <div className="mb-6">
+                          {/* Tech Stack - mobile-optimized badges */}
+                          <div className="mb-4 sm:mb-6">
                             <h4 className="text-white font-semibold mb-2 text-sm">Tech Stack</h4>
                             <div className="flex flex-wrap gap-1">
                               {projects[activeProject].tech.slice(0, 6).map((tech) => (
@@ -665,10 +724,11 @@ export default function Portfolio() {
                             </div>
                           </div>
 
-                          <div className="flex flex-col sm:flex-row gap-3">
+                          {/* Action Button - full width on mobile */}
+                          <div className="w-full">
                             <Button
-                              size="sm"
-                              className={`bg-gradient-to-r ${projects[activeProject].gradient} hover:opacity-90 text-white transition-all duration-300 transform hover:scale-105 flex-1`}
+                              size={isMobile ? "default" : "sm"}
+                              className={`bg-gradient-to-r ${projects[activeProject].gradient} hover:opacity-90 text-white transition-all duration-300 transform hover:scale-105 w-full sm:w-auto px-6 py-2`}
                               onClick={() => window.open(projects[activeProject].github, "_blank")}
                             >
                               <Github className="mr-2 h-4 w-4" />
@@ -682,41 +742,46 @@ export default function Portfolio() {
                 </motion.div>
               </AnimatePresence>
 
+              {/* Navigation buttons - mobile-friendly */}
               <div className="flex justify-center mt-6 gap-4">
                 <Button
                   variant="outline"
-                  size="sm"
+                  size={isMobile ? "default" : "sm"}
                   onClick={() => setActiveProject((prev) => (prev - 1 + projects.length) % projects.length)}
                   className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20"
                 >
                   <ArrowRight className="w-4 h-4 rotate-180" />
+                  {!isMobile && <span className="ml-2">Previous</span>}
                 </Button>
                 <Button
                   variant="outline"
-                  size="sm"
+                  size={isMobile ? "default" : "sm"}
                   onClick={() => setActiveProject((prev) => (prev + 1) % projects.length)}
                   className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20"
                 >
+                  {!isMobile && <span className="mr-2">Next</span>}
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </div>
             </div>
 
-            <div className="flex justify-center gap-3 mt-8">
+            {/* Project thumbnails - desktop layout preserved, mobile optimized */}
+            <div className="flex justify-center gap-2 sm:gap-3 mt-6 sm:mt-8">
               {projects.map((project, index) => (
                 <motion.button
                   key={project.id}
                   onClick={() => setActiveProject(index)}
-                  className={`relative overflow-hidden rounded-lg transition-all duration-300 ${index === activeProject
-                    ? "ring-2 ring-purple-400 scale-110"
-                    : "opacity-60 hover:opacity-100 hover:scale-105"
-                    }`}
-                  whileHover={{ y: -3 }}
+                  className={`relative overflow-hidden rounded-lg transition-all duration-300 ${
+                    index === activeProject
+                      ? "ring-2 ring-purple-400 scale-110"
+                      : "opacity-60 hover:opacity-100 hover:scale-105"
+                  }`}
+                  whileHover={isMobile ? {} : { y: -3 }}
                 >
                   <img
-                    src={project.image}
+                    src={project.image || "/placeholder.svg"}
                     alt={project.title}
-                    className="w-20 h-20 object-cover"
+                    className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 object-cover"
                   />
                   <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -725,41 +790,48 @@ export default function Portfolio() {
                 </motion.button>
               ))}
             </div>
+
+            {/* Mobile navigation hint */}
+            {isMobile && (
+              <div className="text-center mt-6">
+                <p className="text-gray-500 text-sm">Tap navigation buttons or thumbnails to explore projects</p>
+              </div>
+            )}
           </div>
         </section>
 
-        <section id="contact" className="py-20 bg-white/5 backdrop-blur-sm">
+        <section id="contact" className="py-16 sm:py-20 bg-white/5 backdrop-blur-sm">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: isMobile ? 0.5 : 0.8 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
                 Let's Connect
               </h2>
-              <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">
+              <p className="text-lg sm:text-xl text-gray-400 mb-8 sm:mb-12 max-w-2xl mx-auto px-4">
                 Interested in collaboration, research opportunities, or just want to chat about AI? I'd love to hear
                 from you!
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-6 justify-center">
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center">
                 <Button
-                  size="lg"
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-4 text-lg font-semibold rounded-full transition-all duration-300 transform hover:scale-105"
+                  size={isMobile ? "default" : "lg"}
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-full transition-all duration-300 transform hover:scale-105"
                   onClick={() => window.open("mailto:devojyotimisra1@gmail.com", "_blank")}
                 >
-                  <Mail className="mr-2 h-5 w-5" />
+                  <Mail className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                   Send Email
                 </Button>
                 <Button
                   variant="outline"
-                  size="lg"
-                  className="border-2 border-blue-500/50 text-blue-400 hover:bg-blue-500/20 hover:text-white px-8 py-4 text-lg font-semibold rounded-full transition-all duration-300 transform hover:scale-105 bg-white/5 backdrop-blur-sm"
+                  size={isMobile ? "default" : "lg"}
+                  className="border-2 border-blue-500/50 text-blue-400 hover:bg-blue-500/20 hover:text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-full transition-all duration-300 transform hover:scale-105 bg-white/5 backdrop-blur-sm"
                   onClick={() => window.open("https://linkedin.com/in/devojyotimisra", "_blank")}
                 >
-                  <Linkedin className="mr-2 h-5 w-5" />
+                  <Linkedin className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                   LinkedIn
                 </Button>
               </div>
@@ -767,9 +839,9 @@ export default function Portfolio() {
           </div>
         </section>
 
-        <footer className="py-8 border-t border-white/10 bg-white/5 backdrop-blur-sm">
+        <footer className="py-6 sm:py-8 border-t border-white/10 bg-white/5 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <p className="text-gray-400">© 2025 Devojyoti Misra</p>
+            <p className="text-gray-400 text-sm sm:text-base">© 2025 Devojyoti Misra</p>
           </div>
         </footer>
       </div>

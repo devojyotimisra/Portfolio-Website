@@ -68,6 +68,7 @@
   }
 }
 
+/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -85,21 +86,25 @@
   background: linear-gradient(to bottom, #7c3aed, #db2777);
 }
 
+/* Smooth scrolling */
 html {
   scroll-behavior: smooth;
 }
 
+/* Selection styling */
 ::selection {
   background: rgba(139, 92, 246, 0.3);
   color: white;
 }
 
+/* Focus styles */
 button:focus-visible,
 a:focus-visible {
   outline: 2px solid #8b5cf6;
   outline-offset: 2px;
 }
 
+/* Prevent scrolling on 404 page */
 .no-scroll {
   overflow: hidden !important;
   height: 100vh !important;
