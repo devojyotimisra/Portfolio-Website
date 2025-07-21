@@ -431,9 +431,7 @@ export default function Portfolio() {
             </motion.div>
 
             <div className="relative">
-              {/* Vertical line */}
-              <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-purple-500 via-pink-500 to-blue-500 rounded-full" />
-
+              <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-purple-500 via-pink-500 to-blue-500 rounded-full" />
               <div className="space-y-24">
                 {roadmapData.map((item, index) => (
                   <motion.div
@@ -445,7 +443,6 @@ export default function Portfolio() {
                     className={`flex flex-col md:flex-row items-center ${index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
                       }`}
                   >
-                    {/* Content Box */}
                     <div className="w-full md:w-1/2 px-4 md:px-8 text-center md:text-left">
                       <Card className="bg-white/10 backdrop-blur-xl border border-white/20 hover:bg-white/15 transition-all duration-300">
                         <CardContent className="p-8">
@@ -471,7 +468,6 @@ export default function Portfolio() {
                       </Card>
                     </div>
 
-                    {/* Circle Icon */}
                     <div className="relative z-10 my-6 md:my-0 flex-shrink-0">
                       <div
                         className={`w-20 h-20 rounded-full bg-gradient-to-r ${item.color} flex items-center justify-center border-4 border-black`}
@@ -480,7 +476,6 @@ export default function Portfolio() {
                       </div>
                     </div>
 
-                    {/* Spacer on larger screens only */}
                     <div className="hidden md:block w-1/2" />
                   </motion.div>
                 ))}
@@ -488,8 +483,6 @@ export default function Portfolio() {
             </div>
           </div>
         </section>
-
-
 
         <section id="skills" className="py-20 bg-white/5 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
