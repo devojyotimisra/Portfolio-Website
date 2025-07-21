@@ -732,7 +732,7 @@ export default function Portfolio() {
                   <img
                     src={project.image}
                     alt={project.title}
-                    className="w-16 h-16 object-cover"
+                    className="w-20 h-20 object-cover"
                   />
                   <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
                   <div className="absolute inset-0 flex items-center justify-center">
